@@ -1,0 +1,26 @@
+import type { Metadata } from "next";
+import "./globals.css";
+import AuthProvider from "@/components/AuthProvider";
+import Navbar from "@/components/Navbar";
+
+export const metadata: Metadata = {
+  title: "ครอบครัวมีสุข - The Community Happiness Space",
+  description: "ระบบนิเวศการเรียนรู้ตลอดชีวิตเพื่อพัฒนาทักษะสำหรับทุกคน",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="th" className="h-full antialiased">
+      <body className="min-h-full flex flex-col">
+        <AuthProvider>
+          <Navbar />
+          {children}
+        </AuthProvider>
+      </body>
+    </html>
+  );
+}
