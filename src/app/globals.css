@@ -33,6 +33,13 @@ body {
   min-height: 100vh;
   margin: 0;
   padding: 0;
+  font-size: 16px; /* Base size */
+}
+
+@media (min-width: 768px) {
+  body {
+    font-size: 18px; /* Slightly larger on desktop */
+  }
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -69,7 +76,7 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 8px;
   font-weight: 500;
   font-size: 16px;
-  padding: 10px 24px;
+  padding: 14px 28px; /* Increased for mobile touch */
   border: none;
   cursor: pointer;
   box-shadow: 0px 2px 4px rgba(0,0,0,0.1);
@@ -87,7 +94,7 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 8px;
   font-weight: 500;
   font-size: 16px;
-  padding: 10px 24px;
+  padding: 14px 28px; /* Increased for mobile touch */
   border: none;
   cursor: pointer;
   box-shadow: 0px 2px 4px rgba(0,0,0,0.1);

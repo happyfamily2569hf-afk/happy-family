@@ -23,7 +23,7 @@ export default function Navbar() {
         <img src="/logo.png" alt="ครอบครัวมีสุข โลโก้" style={{ height: '40px', width: 'auto' }} />
         <span style={{ color: 'var(--primary)' }}>ครอบครัวมีสุข</span>
       </Link>
-      <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+      <div className="hidden md:flex gap-8 items-center">
         <Link href="/courses" style={{ color: 'var(--text-dark)', textDecoration: 'none', fontWeight: 500 }}>หลักสูตรวิดีโอ</Link>
         <Link href="/ebooks" style={{ color: 'var(--text-dark)', textDecoration: 'none', fontWeight: 500 }}>E-Book</Link>
         <Link href="/posters" style={{ color: 'var(--text-dark)', textDecoration: 'none', fontWeight: 500 }}>สื่อความรู้</Link>
@@ -32,7 +32,7 @@ export default function Navbar() {
           <>
             <Link href="/dashboard" style={{ color: 'var(--secondary)', textDecoration: 'none', fontWeight: 500 }}>ความคืบหน้าของฉัน</Link>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <span style={{ fontSize: '0.875rem', color: 'var(--text-light)' }}>
+              <span style={{ fontSize: '0.9rem', color: 'var(--text-light)', fontWeight: 500 }}>
                 {session.user?.name || session.user?.email}
               </span>
               <button 
