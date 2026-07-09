@@ -5,14 +5,10 @@ import Image from "next/image";
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const videoCount = await prisma.video.count();
-  const ebookCount = await prisma.ebook.count();
-  const posterCount = await prisma.poster.count();
-
-  const latestActivities = await prisma.activity.findMany({
-    orderBy: { eventDate: 'desc' },
-    take: 3
-  });
+  const latestCourses = await prisma.course.findMany({ take: 3, orderBy: { id: 'desc' } });
+  const latestEbooks = await prisma.ebook.findMany({ take: 3, orderBy: { createdAt: 'desc' } });
+  const latestPosters = await prisma.poster.findMany({ take: 3, orderBy: { createdAt: 'desc' } });
+  const latestActivities = await prisma.activity.findMany({ orderBy: { eventDate: 'desc' }, take: 3 });
 
   return (
     <main style={{ flex: 1 }}>
@@ -53,34 +49,106 @@ export default async function Home() {
         </div>
       </section>
 
-      <section style={{ padding: '5rem 1rem', background: 'white' }}>
-        <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-            <h2 style={{ fontSize: '2.5rem', fontWeight: 600, color: 'var(--text-dark)' }}>เนื้อหาที่น่าสนใจ</h2>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
-            <div className="card-medee" style={{ padding: '2.5rem 2rem', textAlign: 'center' }}>
-              <h3 style={{ color: 'var(--primary)', fontSize: '1.75rem', marginBottom: '1rem' }}>วิดีโอ {videoCount} บทเรียน</h3>
-              <p style={{ color: 'var(--text-light)', fontSize: '1.1rem' }}>เรียนรู้เคล็ดลับการดูแลสุขภาพจิตและกาย จากผู้เชี่ยวชาญ</p>
-            </div>
-            <div className="card-medee" style={{ padding: '2.5rem 2rem', textAlign: 'center' }}>
-              <h3 style={{ color: 'var(--secondary)', fontSize: '1.75rem', marginBottom: '1rem' }}>E-Book {ebookCount} เรื่อง</h3>
-              <p style={{ color: 'var(--text-light)', fontSize: '1.1rem' }}>หนังสืออิเล็กทรอนิกส์อ่านสนุก พร้อมภาพประกอบสวยงาม</p>
-            </div>
-            <div className="card-medee" style={{ padding: '2.5rem 2rem', textAlign: 'center' }}>
-              <h3 style={{ color: 'var(--accent)', fontSize: '1.75rem', marginBottom: '1rem' }}>โปสเตอร์ {posterCount} แผ่น</h3>
-              <p style={{ color: 'var(--text-light)', fontSize: '1.1rem' }}>สรุปความรู้แบบรวบรัด นำไปใช้ได้จริงในชีวิตประจำวัน</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {latestActivities.length > 0 && (
-        <section style={{ padding: '5rem 1rem', background: '#f8fafc' }}>
+      {/* 1. Courses Teaser */}
+      {latestCourses.length > 0 && (
+        <section style={{ padding: '4rem 1rem', background: 'white' }}>
           <div className="container">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
-              <h2 style={{ fontSize: '2.5rem', fontWeight: 600, color: 'var(--text-dark)' }}>ภาพรวมกิจกรรมล่าสุด</h2>
-              <Link href="/activities" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600, fontSize: '1.1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+              <h2 style={{ fontSize: '2rem', fontWeight: 600, color: 'var(--primary)' }}>📚 แนะนำหลักสูตรน่าสนใจ</h2>
+              <Link href="/courses" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}>
+                ดูหลักสูตรทั้งหมด ➔
+              </Link>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '2rem' }}>
+              {latestCourses.map(course => (
+                <div key={course.id} className="card-medee" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                  {course.imageUrl ? (
+                    <div style={{ height: '200px', width: '100%' }}>
+                      <img src={course.imageUrl} alt={course.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
+                  ) : (
+                    <div style={{ height: '200px', width: '100%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ color: '#94a3b8' }}>ไม่มีรูปภาพ</span>
+                    </div>
+                  )}
+                  <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-dark)', marginBottom: '0.5rem' }}>{course.title}</h3>
+                    <p style={{ color: 'var(--text-light)', fontSize: '0.95rem', marginBottom: '1.5rem', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      {course.description}
+                    </p>
+                    <div style={{ marginTop: 'auto' }}>
+                      <Link href="/courses" className="btn-primary" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
+                        เข้าเรียน
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 2. E-Books Teaser */}
+      {latestEbooks.length > 0 && (
+        <section style={{ padding: '4rem 1rem', background: '#f8fafc' }}>
+          <div className="container">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+              <h2 style={{ fontSize: '2rem', fontWeight: 600, color: 'var(--secondary)' }}>📖 คลังความรู้ E-Book</h2>
+              <Link href="/ebooks" style={{ color: 'var(--secondary)', textDecoration: 'none', fontWeight: 600 }}>
+                ดู E-Book ทั้งหมด ➔
+              </Link>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '2rem' }}>
+              {latestEbooks.map(ebook => (
+                <div key={ebook.id} className="card-medee" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ height: '300px', width: '100%', padding: '1rem', background: '#f1f5f9' }}>
+                    <img src={ebook.coverUrl} alt={ebook.title} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                  </div>
+                  <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-dark)', marginBottom: '0.5rem' }}>{ebook.title}</h3>
+                    <p style={{ color: 'var(--text-light)', fontSize: '0.95rem', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{ebook.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 3. Posters Teaser */}
+      {latestPosters.length > 0 && (
+        <section style={{ padding: '4rem 1rem', background: 'white' }}>
+          <div className="container">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+              <h2 style={{ fontSize: '2rem', fontWeight: 600, color: 'var(--accent)' }}>🖼️ โปสเตอร์ความรู้</h2>
+              <Link href="/posters" style={{ color: 'var(--accent)', textDecoration: 'none', fontWeight: 600 }}>
+                ดูโปสเตอร์ทั้งหมด ➔
+              </Link>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '2rem' }}>
+              {latestPosters.map(poster => (
+                <div key={poster.id} className="card-medee" style={{ overflow: 'hidden' }}>
+                  <div style={{ height: '300px', width: '100%' }}>
+                    <img src={poster.imageUrl} alt={poster.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
+                  <div style={{ padding: '1rem' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-dark)', margin: 0, textAlign: 'center' }}>{poster.title}</h3>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 4. Activities Teaser */}
+      {latestActivities.length > 0 && (
+        <section style={{ padding: '4rem 1rem', background: '#f8fafc' }}>
+          <div className="container">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+              <h2 style={{ fontSize: '2rem', fontWeight: 600, color: 'var(--text-dark)' }}>🗓️ ภาพรวมกิจกรรมล่าสุด</h2>
+              <Link href="/activities" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}>
                 ดูข่าวทั้งหมด ➔
               </Link>
             </div>
