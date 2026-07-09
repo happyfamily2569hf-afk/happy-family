@@ -16,27 +16,44 @@ export default function BottomNav() {
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-      <div className="flex justify-around items-center h-16">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex flex-col items-center justify-center w-full h-full text-center text-sm transition-colors ${
-                isActive ? "text-[#10b981]" : "text-gray-500 hover:text-gray-900"
-              }`}
-              style={{ textDecoration: "none" }}
-            >
-              <span className="text-2xl mb-1">{item.icon}</span>
-              <span className={`text-[11px] font-medium ${isActive ? "font-bold" : ""}`}>
-                {item.name}
-              </span>
-            </Link>
-          );
-        })}
-      </div>
+    <div className="mobile-only" style={{
+      position: 'fixed',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      background: 'white',
+      borderTop: '1px solid #e2e8f0',
+      zIndex: 50,
+      boxShadow: '0 -2px 10px rgba(0,0,0,0.05)',
+      height: '64px',
+      display: 'flex',
+      justifyContent: 'space-around',
+      alignItems: 'center'
+    }}>
+      {navItems.map((item) => {
+        const isActive = pathname === item.href;
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              width: '100%', 
+              height: '100%', 
+              textDecoration: "none",
+              color: isActive ? '#10b981' : '#64748b'
+            }}
+          >
+            <span style={{ fontSize: '1.5rem', marginBottom: '2px' }}>{item.icon}</span>
+            <span style={{ fontSize: '11px', fontWeight: isActive ? 700 : 500 }}>
+              {item.name}
+            </span>
+          </Link>
+        );
+      })}
     </div>
   );
 }

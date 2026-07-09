@@ -23,7 +23,7 @@ export default function Navbar() {
         <img src="/logo.png" alt="ครอบครัวมีสุข โลโก้" style={{ height: '40px', width: 'auto' }} />
         <span style={{ color: 'var(--primary)' }}>ครอบครัวมีสุข</span>
       </Link>
-      <div className="hidden md:flex gap-8 items-center">
+      <div className="desktop-only" style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
         <Link href="/courses" style={{ color: 'var(--text-dark)', textDecoration: 'none', fontWeight: 500 }}>หลักสูตรวิดีโอ</Link>
         <Link href="/ebooks" style={{ color: 'var(--text-dark)', textDecoration: 'none', fontWeight: 500 }}>E-Book</Link>
         <Link href="/posters" style={{ color: 'var(--text-dark)', textDecoration: 'none', fontWeight: 500 }}>สื่อความรู้</Link>
