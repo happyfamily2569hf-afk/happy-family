@@ -35,8 +35,8 @@ export default async function Home() {
             fontWeight: 300,
             lineHeight: 1.6
           }}>
-            “ครอบครัวมีสุข” เป็นส่วนหนึ่งของโครงการที่มุ่งเน้นการสร้างระบบนิเวศ 
-            การเรียนรู้ตลอดชีวิต เพื่อพัฒนาทักษะในยุคดิจิทัล สำหรับผู้สูงวัย
+            “ครอบครัวมีสุข” แพลตฟอร์มการเรียนรู้ออนไลน์ที่มุ่งเน้นการสร้างระบบนิเวศ 
+            การเรียนรู้ตลอดชีวิต เพื่อเสริมสร้างความสัมพันธ์และพัฒนาทักษะของทุกครอบครัวในยุคดิจิทัล
           </p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
             <Link href="/courses" className="btn-primary" style={{ textDecoration: 'none', fontSize: '1.25rem', padding: '12px 32px', borderRadius: '50px' }}>
@@ -45,6 +45,38 @@ export default async function Home() {
             <Link href="/register" className="btn-outline" style={{ textDecoration: 'none', fontSize: '1.25rem', padding: '12px 32px', borderRadius: '50px' }}>
               สมัครสมาชิก
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* About Project Section */}
+      <section style={{ padding: '5rem 1rem', background: 'var(--bg-gradient)' }}>
+        <div className="container" style={{ textAlign: 'center' }}>
+          <h2 style={{ fontSize: '2.5rem', fontWeight: 700, color: 'var(--primary)', marginBottom: '1rem' }}>
+            โครงการ ครอบครัวมีสุข
+          </h2>
+          <p style={{ fontSize: '1.2rem', color: 'var(--text-light)', maxWidth: '800px', margin: '0 auto 4rem auto', lineHeight: 1.8 }}>
+            แพลตฟอร์มการเรียนรู้ออนไลน์ที่ออกแบบมาเพื่อเสริมสร้างความสัมพันธ์ในครอบครัวยุคใหม่ 
+            รวบรวมองค์ความรู้จากผู้เชี่ยวชาญของมหาวิทยาลัยราชภัฏนครราชสีมา เพื่อให้ทุกคนในครอบครัว
+            ได้เรียนรู้ พัฒนาทักษะ และใช้เวลาคุณภาพร่วมกันอย่างมีความสุข
+          </p>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem' }}>
+            <div className="card-medee" style={{ padding: '2rem' }}>
+              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>👨‍👩‍👧‍👦</div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-dark)', marginBottom: '1rem' }}>สร้างความสัมพันธ์ที่เข้มแข็ง</h3>
+              <p style={{ color: 'var(--text-light)', fontSize: '0.95rem' }}>เรียนรู้วิธีการสื่อสารและการทำกิจกรรมร่วมกัน เพื่อลดช่องว่างระหว่างวัยและสร้างความเข้าใจในครอบครัว</p>
+            </div>
+            <div className="card-medee" style={{ padding: '2rem' }}>
+              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🛡️</div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-dark)', marginBottom: '1rem' }}>รู้เท่าทันโลกดิจิทัล</h3>
+              <p style={{ color: 'var(--text-light)', fontSize: '0.95rem' }}>ติดอาวุธทางความคิดให้พ่อแม่และลูก เพื่อรับมือกับภัยเงียบในโลกออนไลน์และการใช้สื่ออย่างสร้างสรรค์</p>
+            </div>
+            <div className="card-medee" style={{ padding: '2rem' }}>
+              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎓</div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-dark)', marginBottom: '1rem' }}>การันตีคุณภาพโดยผู้เชี่ยวชาญ</h3>
+              <p style={{ color: 'var(--text-light)', fontSize: '0.95rem' }}>เนื้อหาทุกบทเรียนถูกกลั่นกรองและพัฒนาโดยคณาจารย์ผู้ทรงคุณวุฒิ จากมหาวิทยาลัยราชภัฏนครราชสีมา</p>
+            </div>
           </div>
         </div>
       </section>
