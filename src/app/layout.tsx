@@ -4,6 +4,8 @@ import AuthProvider from "@/components/AuthProvider";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "ครอบครัวมีสุข - The Community Happiness Space",
   description: "ระบบนิเวศการเรียนรู้ตลอดชีวิตเพื่อพัฒนาทักษะสำหรับทุกคน",
