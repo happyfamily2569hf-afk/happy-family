@@ -170,12 +170,15 @@ export default function AdminCoursesPage() {
             </tr>
           </thead>
           <tbody>
-            {courses.map(course => (
+            {courses.map(course => {
+              const totalVideos = course.subjects?.reduce((acc: number, s: any) => acc + (s.videos?.length || 0), 0) || 0;
+              const totalSubjects = course.subjects?.length || 0;
+              return (
               <tr key={course.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
                 <td style={{ padding: '1rem' }}>{course.title}</td>
                 <td style={{ padding: '1rem' }}>
                   <span style={{ background: '#e0e7ff', color: '#3730a3', padding: '0.25rem 0.75rem', borderRadius: '50px', fontSize: '0.85rem' }}>
-                    {course.videos?.length || 0} คลิป
+                    {totalSubjects} วิชา ({totalVideos} คลิป)
                   </span>
                 </td>
                 <td style={{ padding: '1rem' }}>
@@ -185,7 +188,7 @@ export default function AdminCoursesPage() {
                   </div>
                 </td>
               </tr>
-            ))}
+            );})}
             {courses.length === 0 && (
               <tr>
                 <td colSpan={3} style={{ padding: '1rem', textAlign: 'center', color: '#64748b' }}>ยังไม่มีหลักสูตร</td>
