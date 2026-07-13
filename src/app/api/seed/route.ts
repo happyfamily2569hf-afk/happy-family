@@ -16,8 +16,16 @@ export async function GET() {
     data: {
       title: 'หลักสูตรส่งเสริมสุขภาพใจ (Mental Health)',
       description: 'เรียนรู้วิธีการจัดการความเครียด และการส่งเสริมสุขภาพจิตใจที่ดีสำหรับทุกช่วงวัย (ทั้งหมด 15 บทเรียน)',
-      videos: {
-        create: videos
+      subjects: {
+        create: [
+          {
+            title: 'วิชาพื้นฐาน (Default Subject)',
+            description: 'วิชาพื้นฐานสำหรับหลักสูตร',
+            videos: {
+              create: videos
+            }
+          }
+        ]
       }
     }
   });
