@@ -16,7 +16,13 @@ export default async function DashboardPage() {
 
   // ดึงข้อมูลหลักสูตรทั้งหมด
   const allCourses = await prisma.course.findMany({
-    include: { videos: true }
+    include: { 
+      subjects: {
+        include: {
+          videos: true
+        }
+      } 
+    }
   });
 
   // ดึงข้อมูลความคืบหน้าของผู้ใช้
@@ -46,8 +52,9 @@ export default async function DashboardPage() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {allCourses.map(course => {
-              const totalVideos = course.videos.length;
-              const completedCount = course.videos.filter(v => completedVideoIds.has(v.id)).length;
+              const allVideos = course.subjects.flatMap(s => s.videos);
+              const totalVideos = allVideos.length;
+              const completedCount = allVideos.filter(v => completedVideoIds.has(v.id)).length;
               const progressPercentage = totalVideos > 0 ? Math.round((completedCount / totalVideos) * 100) : 0;
               const hasCompletedCourse = progressPercentage === 100 && totalVideos > 0;
 
@@ -81,7 +88,7 @@ export default async function DashboardPage() {
                           />
                         </div>
                       ) : (
-                        <Link href="/courses" className="btn-secondary" style={{ textDecoration: 'none', padding: '0.5rem 1rem', fontSize: '0.9rem' }}>
+                        <Link href={`/courses/${course.id}`} className="btn-secondary" style={{ textDecoration: 'none', padding: '0.5rem 1rem', fontSize: '0.9rem' }}>
                           เรียนต่อให้จบ
                         </Link>
                       )}

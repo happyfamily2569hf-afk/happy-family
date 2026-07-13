@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function CoursesPage() {
   const courses = await prisma.course.findMany({
-    include: { videos: true }
+    orderBy: { id: 'desc' }
   });
 
   return (
