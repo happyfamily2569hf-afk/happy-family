@@ -81,6 +81,24 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* 0. Assessments Teaser */}
+      <section style={{ padding: '4rem 1rem', background: 'white' }}>
+        <div className="container" style={{ textAlign: 'center' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#f0fdf4', color: '#16a34a', fontSize: '2.5rem', marginBottom: '1.5rem' }}>
+            💖
+          </div>
+          <h2 style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--primary)', marginBottom: '1rem' }}>
+            ศูนย์ประเมินสุขภาพกายและใจ
+          </h2>
+          <p style={{ fontSize: '1.1rem', color: 'var(--text-light)', maxWidth: '600px', margin: '0 auto 2rem auto', lineHeight: 1.6 }}>
+            เครื่องมือประเมินสุขภาพเบื้องต้นด้วยตนเอง เช่น แบบประเมินความสุข (THI-15) และแบบประเมินความเครียด (ST-5) รู้ผลทันที พร้อมคำแนะนำการดูแลสุขภาพ
+          </p>
+          <Link href="/assessments" className="btn-primary" style={{ textDecoration: 'none', fontSize: '1.1rem', padding: '12px 32px', borderRadius: '50px', display: 'inline-block' }}>
+            ทำแบบประเมินเลย ➔
+          </Link>
+        </div>
+      </section>
+
       {/* 1. Courses Teaser */}
       {latestCourses.length > 0 && (
         <section style={{ padding: '4rem 1rem', background: 'white' }}>
