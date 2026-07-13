@@ -156,18 +156,22 @@ export default function VideoPlayerClient({
                   🎓 รับใบประกาศนียบัตร
                 </button>
               ) : (
-                <form onSubmit={handleGenerateCertificate} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '400px', margin: '0 auto' }}>
+                <form onSubmit={handleGenerateCertificate} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxWidth: '400px', margin: '0 auto' }}>
+                  <label style={{ fontSize: '1rem', color: '#166534', fontWeight: 500, textAlign: 'left' }}>
+                    กรุณาตรวจสอบหรือแก้ไขชื่อ-นามสกุล<br/>เพื่อพิมพ์ลงบนใบประกาศนียบัตร:
+                  </label>
                   <input 
                     type="text" 
-                    placeholder="พิมพ์ชื่อ-นามสกุล ที่ต้องการให้แสดงบนใบประกาศ" 
+                    placeholder="พิมพ์ชื่อ-นามสกุล ที่ต้องการแสดง" 
                     className="input-medee" 
                     value={certName}
                     onChange={(e) => setCertName(e.target.value)}
                     required
+                    style={{ fontSize: '1.05rem', padding: '0.75rem' }}
                   />
-                  <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                    <button type="submit" className="btn-primary" style={{ background: '#16a34a', border: 'none' }}>ออกใบประกาศเลย</button>
-                    <button type="button" className="btn-outline" onClick={() => setShowCertForm(false)}>ยกเลิก</button>
+                  <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
+                    <button type="submit" className="btn-primary" style={{ background: '#16a34a', border: 'none', padding: '0.75rem 1.5rem' }}>ยืนยันและออกใบประกาศ</button>
+                    <button type="button" className="btn-outline" onClick={() => setShowCertForm(false)} style={{ padding: '0.75rem 1.5rem' }}>ยกเลิก</button>
                   </div>
                 </form>
               )}
