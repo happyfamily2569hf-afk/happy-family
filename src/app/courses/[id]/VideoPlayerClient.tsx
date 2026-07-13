@@ -13,21 +13,26 @@ export default function VideoPlayerClient({
   initialProgressMap: Record<string, boolean>,
   isLoggedIn: boolean 
 }) {
-  const [activeVideo, setActiveVideo] = useState(course.videos[0]);
+  const allVideos = course.subjects?.flatMap((s: any) => s.videos) || [];
+  const [activeVideo, setActiveVideo] = useState(allVideos[0] || null);
   const [progressMap, setProgressMap] = useState<Record<string, boolean>>(initialProgressMap);
   const [loading, setLoading] = useState(false);
   const [canComplete, setCanComplete] = useState(false);
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
+
+  // Certificate states
+  const [showCertForm, setShowCertForm] = useState(false);
+  const [certName, setCertName] = useState("");
   
   const router = useRouter();
 
-  // Reset completion unlock when changing video
+  const allCompleted = allVideos.length > 0 && allVideos.every((v: any) => progressMap[v.id]);
+
   useEffect(() => {
     setCanComplete(false);
     setPlayer(null);
   }, [activeVideo]);
 
-  // Track progress manually for YouTube iframe
   useEffect(() => {
     if (!player) return;
     const interval = setInterval(async () => {
@@ -64,8 +69,20 @@ export default function VideoPlayerClient({
     setLoading(false);
   };
 
-  if (!course.videos || course.videos.length === 0) {
-    return <p>ไม่มีวิดีโอในหลักสูตรนี้</p>;
+  const handleGenerateCertificate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!certName.trim()) {
+      alert("กรุณากรอกชื่อ-นามสกุล");
+      return;
+    }
+    // Redirect to printable certificate page
+    const url = `/certificate?name=${encodeURIComponent(certName)}&course=${encodeURIComponent(course.title)}`;
+    window.open(url, '_blank');
+    setShowCertForm(false);
+  };
+
+  if (allVideos.length === 0) {
+    return <p>ยังไม่มีวิดีโอในหลักสูตรนี้</p>;
   }
 
   return (
@@ -86,7 +103,6 @@ export default function VideoPlayerClient({
                 }}
                 onReady={(e) => setPlayer(e.target)}
                 onStateChange={(e) => {
-                  // YouTube.PlayerState.ENDED = 0
                   if (e.data === 0) setCanComplete(true);
                 }}
                 style={{ width: '100%', height: '100%' }}
@@ -124,34 +140,86 @@ export default function VideoPlayerClient({
             </button>
           )}
         </div>
+
+        {allCompleted && (
+          <div className="card-medee" style={{ padding: '2rem', background: 'linear-gradient(to right, #dcfce7, #f0fdf4)', border: '1px solid #22c55e' }}>
+            <div style={{ textAlign: 'center' }}>
+              <h3 style={{ fontSize: '1.5rem', color: '#166534', marginBottom: '1rem' }}>🎉 ยินดีด้วย! คุณเรียนจบหลักสูตรนี้แล้ว</h3>
+              <p style={{ color: '#15803d', marginBottom: '1.5rem' }}>คุณได้เรียนรู้ครบทุกวิชาในหลักสูตรนี้เรียบร้อยแล้ว สามารถรับใบประกาศนียบัตรได้เลยครับ</p>
+              
+              {!showCertForm ? (
+                <button 
+                  onClick={() => setShowCertForm(true)}
+                  className="btn-primary"
+                  style={{ background: '#16a34a', border: 'none' }}
+                >
+                  🎓 รับใบประกาศนียบัตร
+                </button>
+              ) : (
+                <form onSubmit={handleGenerateCertificate} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '400px', margin: '0 auto' }}>
+                  <input 
+                    type="text" 
+                    placeholder="พิมพ์ชื่อ-นามสกุล ที่ต้องการให้แสดงบนใบประกาศ" 
+                    className="input-medee" 
+                    value={certName}
+                    onChange={(e) => setCertName(e.target.value)}
+                    required
+                  />
+                  <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                    <button type="submit" className="btn-primary" style={{ background: '#16a34a', border: 'none' }}>ออกใบประกาศเลย</button>
+                    <button type="button" className="btn-outline" onClick={() => setShowCertForm(false)}>ยกเลิก</button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        )}
       </div>
       
       <div className="card-medee" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', height: 'fit-content' }}>
-        <h3 style={{ fontSize: '1.5rem', fontWeight: 600, color: 'var(--text-dark)', marginBottom: '0.5rem' }}>
-          บทเรียนทั้งหมด
+        <h3 style={{ fontSize: '1.5rem', fontWeight: 600, color: 'var(--text-dark)', marginBottom: '1rem' }}>
+          วิชาในหลักสูตร
         </h3>
-        {course.videos.map((v: any, index: number) => (
-          <div 
-            key={v.id} 
-            onClick={() => setActiveVideo(v)}
-            style={{ 
-              padding: '1rem', 
-              borderRadius: '8px', 
-              cursor: 'pointer',
-              background: activeVideo?.id === v.id ? 'rgba(16, 185, 129, 0.1)' : 'white',
-              border: activeVideo?.id === v.id ? '1px solid var(--primary)' : '1px solid var(--card-border)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.5rem',
-              transition: 'all 0.2s'
-            }}
-          >
-            <span style={{ fontWeight: 500, color: activeVideo?.id === v.id ? 'var(--primary)' : 'var(--text-dark)' }}>
-              {index + 1}. {v.title}
-            </span>
-            {progressMap[v.id] && <span style={{ fontSize: '0.85rem', color: 'var(--primary)' }}>✅ เรียนจบแล้ว</span>}
+        
+        {course.subjects?.map((subject: any, sIdx: number) => (
+          <div key={subject.id} style={{ marginBottom: '1rem' }}>
+            <h4 style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--primary)', marginBottom: '0.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid #e2e8f0' }}>
+              วิชาที่ {sIdx + 1}: {subject.title}
+            </h4>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {subject.videos?.map((v: any, vIdx: number) => (
+                <div 
+                  key={v.id} 
+                  onClick={() => setActiveVideo(v)}
+                  style={{ 
+                    padding: '0.75rem 1rem', 
+                    borderRadius: '8px', 
+                    cursor: 'pointer',
+                    background: activeVideo?.id === v.id ? 'rgba(16, 185, 129, 0.1)' : 'white',
+                    border: activeVideo?.id === v.id ? '1px solid var(--primary)' : '1px solid transparent',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.25rem',
+                    transition: 'all 0.2s',
+                  }}
+                  className={activeVideo?.id !== v.id ? 'hover:bg-gray-50' : ''}
+                >
+                  <span style={{ fontWeight: 500, fontSize: '0.95rem', color: activeVideo?.id === v.id ? 'var(--primary)' : 'var(--text-dark)' }}>
+                    {vIdx + 1}. {v.title}
+                  </span>
+                  {progressMap[v.id] && <span style={{ fontSize: '0.8rem', color: '#10b981' }}>✅ เรียนจบแล้ว</span>}
+                </div>
+              ))}
+              {(!subject.videos || subject.videos.length === 0) && (
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-light)', paddingLeft: '1rem' }}>ยังไม่มีเนื้อหา</p>
+              )}
+            </div>
           </div>
         ))}
+        {(!course.subjects || course.subjects.length === 0) && (
+          <p>ยังไม่มีวิชาในหลักสูตรนี้</p>
+        )}
       </div>
     </div>
   );

@@ -25,6 +25,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <Link href="/admin/courses" style={{ color: 'white', textDecoration: 'none', padding: '0.5rem 1rem', borderRadius: '8px', display: 'block' }} className="hover:bg-gray-700">
             🎬 จัดการหลักสูตร
           </Link>
+          <Link href="/admin/subjects" style={{ color: 'white', textDecoration: 'none', padding: '0.5rem 1rem', borderRadius: '8px', display: 'block' }} className="hover:bg-gray-700">
+            📘 จัดการวิชา (ในหลักสูตร)
+          </Link>
           <Link href="/admin/activities" style={{ color: 'white', textDecoration: 'none', padding: '0.5rem 1rem', borderRadius: '8px', display: 'block' }} className="hover:bg-gray-700">
             📰 ข่าวสาร/กิจกรรม
           </Link>

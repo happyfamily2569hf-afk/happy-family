@@ -5,18 +5,18 @@ import { useRouter } from "next/navigation";
 
 export default function AdminVideosPage() {
   const [videos, setVideos] = useState<any[]>([]);
-  const [courses, setCourses] = useState<any[]>([]);
+  const [subjects, setSubjects] = useState<any[]>([]);
   
   // Create video form
   const [title, setTitle] = useState("");
   const [youtubeId, setYoutubeId] = useState("");
-  const [courseId, setCourseId] = useState("");
+  const [subjectId, setSubjectId] = useState("");
   
   // Edit video state
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editYoutubeId, setEditYoutubeId] = useState("");
-  const [editCourseId, setEditCourseId] = useState("");
+  const [editSubjectId, setEditSubjectId] = useState("");
 
   const router = useRouter();
 
@@ -34,7 +34,11 @@ export default function AdminVideosPage() {
       setVideos(await videosRes.json());
     }
     if (coursesRes.ok) {
-      setCourses(await coursesRes.json());
+      const data = await coursesRes.json();
+      const allSubjects = data.flatMap((c: any) => 
+        (c.subjects || []).map((s: any) => ({ ...s, courseTitle: c.title }))
+      );
+      setSubjects(allSubjects);
     }
   };
 
@@ -46,14 +50,14 @@ export default function AdminVideosPage() {
       body: JSON.stringify({ 
         title, 
         youtubeId, 
-        courseId: courseId === "" ? null : courseId 
+        subjectId: subjectId === "" ? null : subjectId 
       })
     });
     
     if (res.ok) {
       setTitle("");
       setYoutubeId("");
-      setCourseId("");
+      setSubjectId("");
       fetchData();
       router.refresh();
     } else {
@@ -72,7 +76,7 @@ export default function AdminVideosPage() {
         id: editingId, 
         title: editTitle, 
         youtubeId: editYoutubeId,
-        courseId: editCourseId === "" ? null : editCourseId
+        subjectId: editSubjectId === "" ? null : editSubjectId
       })
     });
 
@@ -101,13 +105,13 @@ export default function AdminVideosPage() {
     setEditingId(v.id);
     setEditTitle(v.title);
     setEditYoutubeId(v.youtubeId);
-    setEditCourseId(v.courseId || "");
+    setEditSubjectId(v.subjectId || "");
   };
 
   return (
     <div>
       <h1 style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--text-dark)', marginBottom: '2rem' }}>
-        จัดการคลังวิดีโอ
+        จัดการคลังวิดีโอ (Videos)
       </h1>
 
       <div className="card-medee" style={{ padding: '2rem', marginBottom: '2rem' }}>
@@ -115,7 +119,7 @@ export default function AdminVideosPage() {
         <form onSubmit={handleAddVideo} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '600px' }}>
           <input 
             type="text" 
-            placeholder="ชื่อบทเรียน/ชื่อวิดีโอ" 
+            placeholder="ชื่อวิดีโอ/หัวข้อ" 
             className="input-medee" 
             value={title} 
             onChange={e => setTitle(e.target.value)} 
@@ -131,11 +135,11 @@ export default function AdminVideosPage() {
           />
           <select 
             className="input-medee" 
-            value={courseId} 
-            onChange={e => setCourseId(e.target.value)}
+            value={subjectId} 
+            onChange={e => setSubjectId(e.target.value)}
           >
-            <option value="">-- ยังไม่จัดเข้าหลักสูตร (ว่าง) --</option>
-            {courses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
+            <option value="">-- ยังไม่จัดเข้าวิชาใดๆ (ว่าง) --</option>
+            {subjects.map(s => <option key={s.id} value={s.id}>{s.courseTitle} - {s.title}</option>)}
           </select>
           <button type="submit" className="btn-primary" style={{ width: 'fit-content' }}>
             + อัปโหลดเข้าคลังวิดีโอ
@@ -169,11 +173,11 @@ export default function AdminVideosPage() {
               />
               <select 
                 className="input-medee" 
-                value={editCourseId} 
-                onChange={e => setEditCourseId(e.target.value)}
+                value={editSubjectId} 
+                onChange={e => setEditSubjectId(e.target.value)}
               >
-                <option value="">-- ยังไม่จัดเข้าหลักสูตร (ว่าง) --</option>
-                {courses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
+                <option value="">-- ยังไม่จัดเข้าวิชาใดๆ (ว่าง) --</option>
+                {subjects.map(s => <option key={s.id} value={s.id}>{s.courseTitle} - {s.title}</option>)}
               </select>
               <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                 <button type="submit" className="btn-primary">บันทึกการแก้ไข</button>
@@ -191,25 +195,25 @@ export default function AdminVideosPage() {
             <tr style={{ background: '#f1f5f9', textAlign: 'left' }}>
               <th style={{ padding: '1rem' }}>ชื่อวิดีโอ</th>
               <th style={{ padding: '1rem' }}>YouTube ID</th>
-              <th style={{ padding: '1rem' }}>สถานะ/หลักสูตร</th>
+              <th style={{ padding: '1rem' }}>วิชาที่สังกัด</th>
               <th style={{ padding: '1rem' }}>จัดการ</th>
             </tr>
           </thead>
           <tbody>
             {videos.map(video => {
-              const assignedCourse = courses.find(c => c.id === video.courseId);
+              const assignedSubject = subjects.find(s => s.id === video.subjectId);
               return (
                 <tr key={video.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
                   <td style={{ padding: '1rem' }}>{video.title}</td>
                   <td style={{ padding: '1rem', color: '#64748b' }}>{video.youtubeId}</td>
                   <td style={{ padding: '1rem' }}>
-                    {video.courseId && assignedCourse ? (
+                    {video.subjectId && assignedSubject ? (
                       <span style={{ background: '#dcfce7', color: '#166534', padding: '0.25rem 0.75rem', borderRadius: '50px', fontSize: '0.85rem' }}>
-                        {assignedCourse.title}
+                        {assignedSubject.courseTitle} &gt; {assignedSubject.title}
                       </span>
                     ) : (
                       <span style={{ background: '#fef3c7', color: '#92400e', padding: '0.25rem 0.75rem', borderRadius: '50px', fontSize: '0.85rem' }}>
-                        ยังไม่มีหลักสูตร
+                        ยังไม่จัดเข้าวิชา
                       </span>
                     )}
                   </td>

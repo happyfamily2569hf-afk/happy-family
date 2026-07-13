@@ -18,7 +18,11 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
   const course = await prisma.course.findUnique({
     where: { id: resolvedParams.id },
     include: {
-      videos: true,
+      subjects: {
+        include: {
+          videos: true
+        }
+      }
     }
   });
 
@@ -27,13 +31,15 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
   }
 
   let progressMap: Record<string, boolean> = {};
+  
+  const allVideos = course.subjects.flatMap(s => s.videos);
 
-  if (session?.user?.id) {
+  if (session?.user?.id && allVideos.length > 0) {
     const userProgress = await prisma.progress.findMany({
       where: {
         userId: session.user.id,
         videoId: {
-          in: course.videos.map(v => v.id)
+          in: allVideos.map(v => v.id)
         }
       }
     });

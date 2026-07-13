@@ -6,7 +6,11 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     const courses = await prisma.course.findMany({
-      include: { videos: true }
+      include: { 
+        subjects: {
+          include: { videos: true }
+        } 
+      }
     });
     return NextResponse.json(courses);
   } catch (e) {

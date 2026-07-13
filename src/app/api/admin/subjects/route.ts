@@ -12,16 +12,16 @@ export async function POST(req: Request) {
 
   try {
     const data = await req.json();
-    const video = await prisma.video.create({
+    const subject = await prisma.subject.create({
       data: {
         title: data.title,
-        youtubeId: data.youtubeId,
-        subjectId: data.subjectId || null,
+        description: data.description || null,
+        courseId: data.courseId,
       }
     });
-    return NextResponse.json(video);
+    return NextResponse.json(subject);
   } catch (e) {
-    return NextResponse.json({ error: "Error creating video" }, { status: 500 });
+    return NextResponse.json({ error: "Error creating subject" }, { status: 500 });
   }
 }
 
@@ -34,17 +34,17 @@ export async function PUT(req: Request) {
 
   try {
     const data = await req.json();
-    const video = await prisma.video.update({
+    const subject = await prisma.subject.update({
       where: { id: data.id },
       data: {
         title: data.title,
-        youtubeId: data.youtubeId,
-        subjectId: data.subjectId || null,
+        description: data.description || null,
+        courseId: data.courseId
       }
     });
-    return NextResponse.json(video);
+    return NextResponse.json(subject);
   } catch (e) {
-    return NextResponse.json({ error: "Error updating video" }, { status: 500 });
+    return NextResponse.json({ error: "Error updating subject" }, { status: 500 });
   }
 }
 
@@ -60,9 +60,9 @@ export async function DELETE(req: Request) {
     const id = searchParams.get('id');
     if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
-    await prisma.video.delete({ where: { id } });
+    await prisma.subject.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (e) {
-    return NextResponse.json({ error: "Error deleting video" }, { status: 500 });
+    return NextResponse.json({ error: "Error deleting subject" }, { status: 500 });
   }
 }

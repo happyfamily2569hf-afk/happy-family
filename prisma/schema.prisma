@@ -56,10 +56,19 @@ model VerificationToken {
 }
 
 model Course {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
   description String
   imageUrl    String?
+  subjects    Subject[]
+}
+
+model Subject {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   videos      Video[]
 }
 
@@ -67,8 +76,8 @@ model Video {
   id          String   @id @default(cuid())
   title       String
   youtubeId   String
-  courseId    String?
-  course      Course?   @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  subjectId   String?
+  subject     Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
   progress    Progress[]
 }
 
