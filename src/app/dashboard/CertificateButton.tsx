@@ -1,68 +1,54 @@
 "use client";
 
-import jsPDF from "jspdf";
+import { useState } from "react";
 
 export default function CertificateButton({ userName, courseName }: { userName: string, courseName: string }) {
-  
-  const generatePDF = () => {
-    // A4 Landscape: 297 x 210 mm
-    const doc = new jsPDF({
-      orientation: "landscape",
-      unit: "mm",
-      format: "a4"
-    });
+  const [showForm, setShowForm] = useState(false);
+  const [certName, setCertName] = useState(userName);
 
-    // We use a basic generic design until the user's template is integrated.
-    // To integrate a template:
-    // doc.addImage("/template.jpg", "JPEG", 0, 0, 297, 210);
-
-    // Draw border
-    doc.setDrawColor(79, 70, 229); // Primary color
-    doc.setLineWidth(3);
-    doc.rect(10, 10, 277, 190);
-
-    // Draw Title
-    doc.setTextColor(30, 41, 59);
-    doc.setFontSize(36);
-    doc.text("Certificate of Completion", 148.5, 60, { align: "center" });
-
-    doc.setFontSize(18);
-    doc.text("This certifies that", 148.5, 90, { align: "center" });
-
-    // Draw Name
-    doc.setFontSize(32);
-    doc.setTextColor(79, 70, 229);
-    doc.text(userName, 148.5, 115, { align: "center" });
-
-    // Draw Line under name
-    doc.setLineWidth(0.5);
-    doc.line(70, 120, 227, 120);
-
-    // Draw Course
-    doc.setFontSize(18);
-    doc.setTextColor(30, 41, 59);
-    doc.text("has successfully completed the course", 148.5, 140, { align: "center" });
-
-    doc.setFontSize(24);
-    doc.setTextColor(16, 185, 129); // Secondary color
-    doc.text(courseName, 148.5, 160, { align: "center" });
-
-    // Date
-    const date = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
-    doc.setFontSize(14);
-    doc.setTextColor(100, 116, 139);
-    doc.text(`Date: ${date}`, 148.5, 185, { align: "center" });
-
-    doc.save(`${userName}_Certificate.pdf`);
+  const handleGenerateCertificate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!certName.trim()) {
+      alert("กรุณากรอกชื่อ-นามสกุล");
+      return;
+    }
+    // Redirect to printable certificate page
+    const url = `/certificate?name=${encodeURIComponent(certName)}&course=${encodeURIComponent(courseName)}`;
+    window.open(url, '_blank');
+    setShowForm(false);
   };
+
+  if (showForm) {
+    return (
+      <form onSubmit={handleGenerateCertificate} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%' }}>
+        <input 
+          type="text" 
+          placeholder="พิมพ์ชื่อ-นามสกุล ที่ต้องการแสดง" 
+          className="input-medee" 
+          value={certName}
+          onChange={(e) => setCertName(e.target.value)}
+          required
+          style={{ fontSize: '0.9rem', padding: '0.5rem' }}
+        />
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button type="submit" className="btn-primary" style={{ background: '#16a34a', border: 'none', padding: '0.5rem', flex: 1, fontSize: '0.9rem' }}>
+            ออกใบประกาศ
+          </button>
+          <button type="button" className="btn-outline" onClick={() => setShowForm(false)} style={{ padding: '0.5rem', fontSize: '0.9rem' }}>
+            ยกเลิก
+          </button>
+        </div>
+      </form>
+    );
+  }
 
   return (
     <button 
-      onClick={generatePDF}
+      onClick={() => setShowForm(true)}
       className="btn-primary" 
-      style={{ background: 'var(--primary)', width: '100%' }}
+      style={{ background: '#16a34a', width: '100%', border: 'none' }}
     >
-      📄 ดาวน์โหลดใบประกาศนียบัตร
+      🎓 รับใบประกาศนียบัตร
     </button>
   );
 }
