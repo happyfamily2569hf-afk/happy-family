@@ -72,18 +72,19 @@ const q8_16 = [
 ];
 
 export default function LifestyleAssessment() {
-  const [answers, setAnswers] = useState<Record<number, number>>({});
+  // Store the selected option index or identifier to avoid highlighting multiple options with same score
+  const [answers, setAnswers] = useState<Record<number, { score: number, selected: string | number }>>({});
   const [result, setResult] = useState<{ score: number, level: string, text: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSelect = (questionId: number, score: number) => {
-    setAnswers(prev => ({ ...prev, [questionId]: score }));
+  const handleSelect = (questionId: number, score: number, selected: string | number) => {
+    setAnswers(prev => ({ ...prev, [questionId]: { score, selected } }));
   };
 
   const calculateScore = () => {
     let totalScore = 0;
     for (const val of Object.values(answers)) {
-      totalScore += val;
+      totalScore += val.score;
     }
     return totalScore;
   };
@@ -116,12 +117,17 @@ export default function LifestyleAssessment() {
     setResult({ score, level, text });
 
     try {
+      // Just extract scores for saving to API if needed, but we can pass the whole object
+      const formattedAnswers = Object.fromEntries(
+        Object.entries(answers).map(([k, v]) => [k, v.score])
+      );
+
       const response = await fetch('/api/submit-assessment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           assessmentName: 'Lifestyle-Medicine',
-          answers,
+          answers: formattedAnswers,
           score,
           level,
           timestamp: new Date().toISOString()
@@ -169,8 +175,8 @@ export default function LifestyleAssessment() {
                         <input 
                           type="radio" 
                           name={`q${q.id}`} 
-                          checked={answers[q.id] === q.yesScore}
-                          onChange={() => handleSelect(q.id, q.yesScore)}
+                          checked={answers[q.id]?.selected === 'yes'}
+                          onChange={() => handleSelect(q.id, q.yesScore, 'yes')}
                           style={{ width: '1.2rem', height: '1.2rem', accentColor: 'var(--primary)' }}
                         />
                         <span>ใช่</span>
@@ -179,8 +185,8 @@ export default function LifestyleAssessment() {
                         <input 
                           type="radio" 
                           name={`q${q.id}`} 
-                          checked={answers[q.id] === q.noScore}
-                          onChange={() => handleSelect(q.id, q.noScore)}
+                          checked={answers[q.id]?.selected === 'no'}
+                          onChange={() => handleSelect(q.id, q.noScore, 'no')}
                           style={{ width: '1.2rem', height: '1.2rem', accentColor: 'var(--primary)' }}
                         />
                         <span>ไม่ใช่</span>
@@ -201,17 +207,17 @@ export default function LifestyleAssessment() {
                         <label key={opt} style={{ 
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           padding: '0.5rem', border: '1px solid',
-                          borderColor: answers[q.id] === q.scores[idx] ? 'var(--primary)' : '#e2e8f0',
-                          backgroundColor: answers[q.id] === q.scores[idx] ? '#f0fdf4' : 'transparent',
+                          borderColor: answers[q.id]?.selected === idx ? 'var(--primary)' : '#e2e8f0',
+                          backgroundColor: answers[q.id]?.selected === idx ? '#f0fdf4' : 'transparent',
                           borderRadius: '8px', cursor: 'pointer', textAlign: 'center'
                         }}>
                           <input 
                             type="radio" 
                             name={`q${q.id}`} 
                             style={{ display: 'none' }}
-                            onChange={() => handleSelect(q.id, q.scores[idx])}
+                            onChange={() => handleSelect(q.id, q.scores[idx], idx)}
                           />
-                          <span style={{ color: answers[q.id] === q.scores[idx] ? '#15803d' : '#334155', fontWeight: answers[q.id] === q.scores[idx] ? 600 : 400 }}>
+                          <span style={{ color: answers[q.id]?.selected === idx ? '#15803d' : '#334155', fontWeight: answers[q.id]?.selected === idx ? 600 : 400 }}>
                             {opt}
                           </span>
                         </label>
