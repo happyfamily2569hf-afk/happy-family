@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
+import { uploadFile } from "@/lib/upload";
+
 export default function AdminSubjectsPage() {
   const [courses, setCourses] = useState<any[]>([]);
   const [subjects, setSubjects] = useState<any[]>([]);
@@ -11,12 +13,14 @@ export default function AdminSubjectsPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [courseId, setCourseId] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editCourseId, setEditCourseId] = useState("");
+  const [editImageFile, setEditImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -43,16 +47,24 @@ export default function AdminSubjectsPage() {
     }
     
     setIsSubmitting(true);
+    let imageUrl = "";
+    if (imageFile) {
+      const uploadedUrl = await uploadFile(imageFile);
+      if (uploadedUrl) imageUrl = uploadedUrl;
+    }
+
     const res = await fetch("/api/admin/subjects", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, description, courseId })
+      body: JSON.stringify({ title, description, courseId, imageUrl })
     });
     
     if (res.ok) {
       setTitle("");
       setDescription("");
       setCourseId("");
+      setImageFile(null);
+      (e.target as HTMLFormElement).reset();
       fetchData();
       router.refresh();
     } else {
@@ -66,6 +78,12 @@ export default function AdminSubjectsPage() {
     if (!editingId || !editCourseId) return;
     setIsSubmitting(true);
 
+    let imageUrl = undefined;
+    if (editImageFile) {
+      const uploadedUrl = await uploadFile(editImageFile);
+      if (uploadedUrl) imageUrl = uploadedUrl;
+    }
+
     const res = await fetch("/api/admin/subjects", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -73,7 +91,8 @@ export default function AdminSubjectsPage() {
         id: editingId, 
         title: editTitle, 
         description: editDescription,
-        courseId: editCourseId
+        courseId: editCourseId,
+        imageUrl
       })
     });
 
@@ -104,6 +123,7 @@ export default function AdminSubjectsPage() {
     setEditTitle(s.title);
     setEditDescription(s.description || "");
     setEditCourseId(s.courseId);
+    setEditImageFile(null);
   };
 
   return (
@@ -127,6 +147,11 @@ export default function AdminSubjectsPage() {
           <input type="text" placeholder="ชื่อวิชา" className="input-medee" value={title} onChange={e => setTitle(e.target.value)} required />
           <textarea placeholder="รายละเอียดวิชา (ถ้ามี)" className="input-medee" rows={2} value={description} onChange={e => setDescription(e.target.value)} />
           
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <label style={{ fontSize: '0.9rem', color: 'var(--text-light)' }}>รูปหน้าปกวิชา (ถ้ามี)</label>
+            <input type="file" accept="image/*" className="input-medee" onChange={e => setImageFile(e.target.files?.[0] || null)} />
+          </div>
+
           <button type="submit" className="btn-primary" style={{ width: 'fit-content' }} disabled={isSubmitting}>
             {isSubmitting ? 'กำลังบันทึก...' : '+ สร้างวิชา'}
           </button>
@@ -153,6 +178,11 @@ export default function AdminSubjectsPage() {
               <input type="text" placeholder="ชื่อวิชา" className="input-medee" value={editTitle} onChange={e => setEditTitle(e.target.value)} required />
               <textarea placeholder="รายละเอียด" className="input-medee" rows={2} value={editDescription} onChange={e => setEditDescription(e.target.value)} />
               
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.9rem', color: 'var(--text-light)' }}>เปลี่ยนรูปหน้าปกวิชา (ถ้ามี)</label>
+                <input type="file" accept="image/*" className="input-medee" onChange={e => setEditImageFile(e.target.files?.[0] || null)} />
+              </div>
+
               <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                 <button type="submit" className="btn-primary" disabled={isSubmitting}>บันทึกการแก้ไข</button>
                 <button type="button" className="btn-outline" onClick={() => setEditingId(null)} disabled={isSubmitting}>ยกเลิก</button>

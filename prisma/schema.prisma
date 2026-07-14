@@ -67,6 +67,7 @@ model Subject {
   id          String   @id @default(cuid())
   title       String
   description String?
+  imageUrl    String?
   courseId    String
   course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   videos      Video[]
@@ -76,6 +77,7 @@ model Video {
   id          String   @id @default(cuid())
   title       String
   youtubeId   String
+  imageUrl    String?
   subjectId   String?
   subject     Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
   progress    Progress[]

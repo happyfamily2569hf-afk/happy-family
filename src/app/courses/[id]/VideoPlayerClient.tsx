@@ -187,9 +187,18 @@ export default function VideoPlayerClient({
         
         {course.subjects?.map((subject: any, sIdx: number) => (
           <div key={subject.id} style={{ marginBottom: '1rem' }}>
-            <h4 style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--primary)', marginBottom: '0.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid #e2e8f0' }}>
-              วิชาที่ {sIdx + 1}: {subject.title}
-            </h4>
+            <div style={{ marginBottom: '0.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid #e2e8f0' }}>
+              {subject.imageUrl && (
+                <img 
+                  src={subject.imageUrl} 
+                  alt={subject.title} 
+                  style={{ width: '100%', height: '120px', objectFit: 'cover', borderRadius: '8px', marginBottom: '0.5rem' }} 
+                />
+              )}
+              <h4 style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--primary)', margin: 0 }}>
+                วิชาที่ {sIdx + 1}: {subject.title}
+              </h4>
+            </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {subject.videos?.map((v: any, vIdx: number) => (
@@ -197,22 +206,31 @@ export default function VideoPlayerClient({
                   key={v.id} 
                   onClick={() => setActiveVideo(v)}
                   style={{ 
-                    padding: '0.75rem 1rem', 
+                    padding: '0.75rem', 
                     borderRadius: '8px', 
                     cursor: 'pointer',
                     background: activeVideo?.id === v.id ? 'rgba(16, 185, 129, 0.1)' : 'white',
                     border: activeVideo?.id === v.id ? '1px solid var(--primary)' : '1px solid transparent',
                     display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.25rem',
+                    alignItems: 'center',
+                    gap: '0.75rem',
                     transition: 'all 0.2s',
                   }}
                   className={activeVideo?.id !== v.id ? 'hover:bg-gray-50' : ''}
                 >
-                  <span style={{ fontWeight: 500, fontSize: '0.95rem', color: activeVideo?.id === v.id ? 'var(--primary)' : 'var(--text-dark)' }}>
-                    {vIdx + 1}. {v.title}
-                  </span>
-                  {progressMap[v.id] && <span style={{ fontSize: '0.8rem', color: '#10b981' }}>✅ เรียนจบแล้ว</span>}
+                  <div style={{ width: '80px', height: '45px', flexShrink: 0, borderRadius: '4px', overflow: 'hidden', background: '#e2e8f0' }}>
+                    <img 
+                      src={v.imageUrl || `https://img.youtube.com/vi/${v.youtubeId}/mqdefault.jpg`} 
+                      alt={v.title}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                    <span style={{ fontWeight: 500, fontSize: '0.9rem', color: activeVideo?.id === v.id ? 'var(--primary)' : 'var(--text-dark)' }}>
+                      {vIdx + 1}. {v.title}
+                    </span>
+                    {progressMap[v.id] && <span style={{ fontSize: '0.75rem', color: '#10b981' }}>✅ เรียนจบแล้ว</span>}
+                  </div>
                 </div>
               ))}
               {(!subject.videos || subject.videos.length === 0) && (

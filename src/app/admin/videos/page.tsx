@@ -3,20 +3,25 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
+import { uploadFile } from "@/lib/upload";
+
 export default function AdminVideosPage() {
   const [videos, setVideos] = useState<any[]>([]);
   const [subjects, setSubjects] = useState<any[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Create video form
   const [title, setTitle] = useState("");
   const [youtubeId, setYoutubeId] = useState("");
   const [subjectId, setSubjectId] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
   
   // Edit video state
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editYoutubeId, setEditYoutubeId] = useState("");
   const [editSubjectId, setEditSubjectId] = useState("");
+  const [editImageFile, setEditImageFile] = useState<File | null>(null);
 
   const router = useRouter();
 
@@ -44,12 +49,20 @@ export default function AdminVideosPage() {
 
   const handleAddVideo = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    let imageUrl = "";
+    if (imageFile) {
+      const uploadedUrl = await uploadFile(imageFile);
+      if (uploadedUrl) imageUrl = uploadedUrl;
+    }
+
     const res = await fetch("/api/admin/videos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
         title, 
         youtubeId, 
+        imageUrl,
         subjectId: subjectId === "" ? null : subjectId 
       })
     });
@@ -58,16 +71,26 @@ export default function AdminVideosPage() {
       setTitle("");
       setYoutubeId("");
       setSubjectId("");
+      setImageFile(null);
+      (e.target as HTMLFormElement).reset();
       fetchData();
       router.refresh();
     } else {
       alert("เกิดข้อผิดพลาดในการเพิ่มวิดีโอ");
     }
+    setIsSubmitting(false);
   };
 
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingId) return;
+    setIsSubmitting(true);
+
+    let imageUrl = undefined;
+    if (editImageFile) {
+      const uploadedUrl = await uploadFile(editImageFile);
+      if (uploadedUrl) imageUrl = uploadedUrl;
+    }
 
     const res = await fetch("/api/admin/videos", {
       method: "PUT",
@@ -76,6 +99,7 @@ export default function AdminVideosPage() {
         id: editingId, 
         title: editTitle, 
         youtubeId: editYoutubeId,
+        imageUrl,
         subjectId: editSubjectId === "" ? null : editSubjectId
       })
     });
@@ -87,6 +111,7 @@ export default function AdminVideosPage() {
     } else {
       alert("เกิดข้อผิดพลาดในการอัปเดตวิดีโอ");
     }
+    setIsSubmitting(false);
   };
 
   const handleDelete = async (id: string) => {
@@ -106,6 +131,7 @@ export default function AdminVideosPage() {
     setEditTitle(v.title);
     setEditYoutubeId(v.youtubeId);
     setEditSubjectId(v.subjectId || "");
+    setEditImageFile(null);
   };
 
   return (
@@ -141,8 +167,12 @@ export default function AdminVideosPage() {
             <option value="">-- ยังไม่จัดเข้าวิชาใดๆ (ว่าง) --</option>
             {subjects.map(s => <option key={s.id} value={s.id}>{s.courseTitle} - {s.title}</option>)}
           </select>
-          <button type="submit" className="btn-primary" style={{ width: 'fit-content' }}>
-            + อัปโหลดเข้าคลังวิดีโอ
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <label style={{ fontSize: '0.9rem', color: 'var(--text-light)' }}>ภาพปกวิดีโอ (ถ้ามี)</label>
+            <input type="file" accept="image/*" className="input-medee" onChange={e => setImageFile(e.target.files?.[0] || null)} />
+          </div>
+          <button type="submit" className="btn-primary" style={{ width: 'fit-content' }} disabled={isSubmitting}>
+            {isSubmitting ? 'กำลังอัปโหลด...' : '+ อัปโหลดเข้าคลังวิดีโอ'}
           </button>
         </form>
       </div>
@@ -179,9 +209,13 @@ export default function AdminVideosPage() {
                 <option value="">-- ยังไม่จัดเข้าวิชาใดๆ (ว่าง) --</option>
                 {subjects.map(s => <option key={s.id} value={s.id}>{s.courseTitle} - {s.title}</option>)}
               </select>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.9rem', color: 'var(--text-light)' }}>เปลี่ยนภาพปกวิดีโอ (ถ้ามี)</label>
+                <input type="file" accept="image/*" className="input-medee" onChange={e => setEditImageFile(e.target.files?.[0] || null)} />
+              </div>
               <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                <button type="submit" className="btn-primary">บันทึกการแก้ไข</button>
-                <button type="button" className="btn-outline" onClick={() => setEditingId(null)}>ยกเลิก</button>
+                <button type="submit" className="btn-primary" disabled={isSubmitting}>บันทึกการแก้ไข</button>
+                <button type="button" className="btn-outline" onClick={() => setEditingId(null)} disabled={isSubmitting}>ยกเลิก</button>
               </div>
             </form>
           </div>

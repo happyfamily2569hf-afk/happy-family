@@ -16,6 +16,7 @@ export async function POST(req: Request) {
       data: {
         title: data.title,
         youtubeId: data.youtubeId,
+        imageUrl: data.imageUrl || null,
         subjectId: data.subjectId || null,
       }
     });
@@ -39,6 +40,7 @@ export async function PUT(req: Request) {
       data: {
         title: data.title,
         youtubeId: data.youtubeId,
+        imageUrl: data.imageUrl !== undefined ? data.imageUrl : undefined,
         subjectId: data.subjectId || null,
       }
     });

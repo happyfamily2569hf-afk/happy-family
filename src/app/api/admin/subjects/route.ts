@@ -16,6 +16,7 @@ export async function POST(req: Request) {
       data: {
         title: data.title,
         description: data.description || null,
+        imageUrl: data.imageUrl || null,
         courseId: data.courseId,
       }
     });
@@ -39,6 +40,7 @@ export async function PUT(req: Request) {
       data: {
         title: data.title,
         description: data.description || null,
+        imageUrl: data.imageUrl !== undefined ? data.imageUrl : undefined,
         courseId: data.courseId
       }
     });
