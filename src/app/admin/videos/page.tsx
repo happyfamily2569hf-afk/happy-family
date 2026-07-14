@@ -227,6 +227,7 @@ export default function AdminVideosPage() {
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ background: '#f1f5f9', textAlign: 'left' }}>
+              <th style={{ padding: '1rem', width: '80px' }}>รูปภาพ</th>
               <th style={{ padding: '1rem' }}>ชื่อวิดีโอ</th>
               <th style={{ padding: '1rem' }}>YouTube ID</th>
               <th style={{ padding: '1rem' }}>วิชาที่สังกัด</th>
@@ -238,6 +239,13 @@ export default function AdminVideosPage() {
               const assignedSubject = subjects.find(s => s.id === video.subjectId);
               return (
                 <tr key={video.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                  <td style={{ padding: '1rem' }}>
+                    {video.imageUrl ? (
+                      <img src={video.imageUrl} alt="cover" style={{ width: '60px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />
+                    ) : (
+                      <div style={{ width: '60px', height: '40px', background: '#e2e8f0', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', color: '#64748b' }}>ไม่มีรูป</div>
+                    )}
+                  </td>
                   <td style={{ padding: '1rem' }}>{video.title}</td>
                   <td style={{ padding: '1rem', color: '#64748b' }}>{video.youtubeId}</td>
                   <td style={{ padding: '1rem' }}>
@@ -262,7 +270,7 @@ export default function AdminVideosPage() {
             })}
             {videos.length === 0 && (
               <tr>
-                <td colSpan={4} style={{ padding: '1rem', textAlign: 'center', color: '#64748b' }}>ยังไม่มีวิดีโอในคลัง</td>
+                <td colSpan={5} style={{ padding: '1rem', textAlign: 'center', color: '#64748b' }}>ยังไม่มีวิดีโอในคลัง</td>
               </tr>
             )}
           </tbody>

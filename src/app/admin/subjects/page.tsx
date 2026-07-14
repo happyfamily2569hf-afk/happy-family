@@ -197,6 +197,7 @@ export default function AdminSubjectsPage() {
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ background: '#f1f5f9', textAlign: 'left' }}>
+              <th style={{ padding: '1rem', width: '80px' }}>รูปภาพ</th>
               <th style={{ padding: '1rem' }}>ชื่อวิชา</th>
               <th style={{ padding: '1rem' }}>สังกัดหลักสูตร</th>
               <th style={{ padding: '1rem' }}>จัดการ</th>
@@ -205,6 +206,13 @@ export default function AdminSubjectsPage() {
           <tbody>
             {subjects.map(subject => (
               <tr key={subject.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                <td style={{ padding: '1rem' }}>
+                  {subject.imageUrl ? (
+                    <img src={subject.imageUrl} alt="cover" style={{ width: '60px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />
+                  ) : (
+                    <div style={{ width: '60px', height: '40px', background: '#e2e8f0', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', color: '#64748b' }}>ไม่มีรูป</div>
+                  )}
+                </td>
                 <td style={{ padding: '1rem' }}>{subject.title}</td>
                 <td style={{ padding: '1rem' }}>
                   <span style={{ background: '#dcfce7', color: '#166534', padding: '0.25rem 0.75rem', borderRadius: '50px', fontSize: '0.85rem' }}>
@@ -221,7 +229,7 @@ export default function AdminSubjectsPage() {
             ))}
             {subjects.length === 0 && (
               <tr>
-                <td colSpan={3} style={{ padding: '1rem', textAlign: 'center', color: '#64748b' }}>ยังไม่มีวิชาในระบบ</td>
+                <td colSpan={4} style={{ padding: '1rem', textAlign: 'center', color: '#64748b' }}>ยังไม่มีวิชาในระบบ</td>
               </tr>
             )}
           </tbody>
