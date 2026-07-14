@@ -58,12 +58,21 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
         </Link>
       </div>
 
-      <div className="card-medee" style={{ padding: '2.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', background: 'var(--bg-gradient)' }}>
-        <h1 style={{ fontSize: '2.25rem', fontWeight: 'bold', color: 'var(--primary)', margin: 0 }}>{course.title}</h1>
-        <p style={{ color: 'var(--text-dark)', fontSize: '1.1rem', margin: 0 }}>{course.description}</p>
+      <div className="card-medee" style={{ padding: '2.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', background: 'var(--bg-gradient)', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <h1 style={{ fontSize: '2.25rem', fontWeight: 'bold', color: 'var(--primary)', margin: 0, textShadow: course.imageUrl ? '0 2px 4px rgba(255,255,255,0.8)' : 'none' }}>{course.title}</h1>
+          <p style={{ color: 'var(--text-dark)', fontSize: '1.1rem', margin: 0, marginTop: '0.5rem', background: course.imageUrl ? 'rgba(255,255,255,0.8)' : 'transparent', padding: course.imageUrl ? '0.5rem' : '0', borderRadius: '4px', display: 'inline-block' }}>{course.description}</p>
+        </div>
         
+        {course.imageUrl && (
+          <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '40%', opacity: 0.3, zIndex: 0 }}>
+            <img src={course.imageUrl} alt={course.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to right, var(--bg-gradient) 0%, transparent 100%)' }}></div>
+          </div>
+        )}
+
         {hasCompletedCourse && (
-          <div style={{ padding: '1.5rem', background: 'linear-gradient(to right, #dcfce7, #f0fdf4)', border: '1px solid #22c55e', borderRadius: '12px', marginTop: '1rem' }}>
+          <div style={{ padding: '1.5rem', background: 'linear-gradient(to right, #dcfce7, #f0fdf4)', border: '1px solid #22c55e', borderRadius: '12px', marginTop: '1rem', position: 'relative', zIndex: 1 }}>
             <h3 style={{ fontSize: '1.5rem', color: '#166534', marginBottom: '1rem' }}>🎉 ยินดีด้วย! คุณเรียนจบหลักสูตรนี้แล้ว</h3>
             <p style={{ color: '#15803d', marginBottom: '1.5rem' }}>คุณได้เรียนรู้ครบทุกวิชาในหลักสูตรนี้เรียบร้อยแล้ว สามารถรับใบประกาศนียบัตรได้เลยครับ</p>
             <div style={{ maxWidth: '400px' }}>
@@ -89,11 +98,23 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
               
               return (
                 <div key={subject.id} className="card-medee" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                  {subject.imageUrl && (
-                    <div style={{ height: '180px', width: '100%', overflow: 'hidden' }}>
+                  <div style={{ 
+                    height: '180px', 
+                    width: '100%', 
+                    background: 'var(--primary-light)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    fontSize: '3rem',
+                    overflow: 'hidden'
+                  }}>
+                    {subject.imageUrl ? (
                       <img src={subject.imageUrl} alt={subject.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </div>
-                  )}
+                    ) : (
+                      <span>📖</span>
+                    )}
+                  </div>
                   <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', flex: 1, gap: '1rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--primary)', fontWeight: 600, fontSize: '0.9rem' }}>
                       <span style={{ padding: '0.25rem 0.75rem', background: 'var(--primary-light)', color: 'white', borderRadius: '50px' }}>วิชาที่ {index + 1}</span>
