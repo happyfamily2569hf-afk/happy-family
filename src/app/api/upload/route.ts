@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { put } from '@vercel/blob';
+import fs from "fs/promises";
+import path from "path";
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
@@ -18,12 +19,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    const blob = await put(file.name, file, { access: 'public' });
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const ext = path.extname(file.name) || '.png';
+    const fileName = `${Date.now()}${ext}`;
+    
+    // Save to public/uploads
+    const uploadDir = path.join(process.cwd(), "public", "uploads");
+    await fs.mkdir(uploadDir, { recursive: true });
+    
+    const filePath = path.join(uploadDir, fileName);
+    await fs.writeFile(filePath, buffer);
 
-    // Return public url from Vercel Blob
-    return NextResponse.json({ url: blob.url });
-  } catch (e) {
+    // Return local url
+    return NextResponse.json({ url: `/uploads/${fileName}` });
+  } catch (e: any) {
     console.error(e);
-    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
+    return NextResponse.json({ error: "Upload failed", details: e.message }, { status: 500 });
   }
 }
