@@ -44,3 +44,31 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: "Error deleting ebook" }, { status: 500 });
   }
 }
+
+export async function PUT(req: Request) {
+  const session = await getServerSession(authOptions);
+  // @ts-ignore
+  if (!session?.user || session.user.role !== 'ADMIN') {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const data = await req.json();
+    const { id, title, description, coverUrl, fileUrl } = data;
+    
+    if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
+
+    const updateData: any = { title, description, fileUrl };
+    if (coverUrl) {
+      updateData.coverUrl = coverUrl;
+    }
+
+    const ebook = await prisma.ebook.update({
+      where: { id },
+      data: updateData
+    });
+    return NextResponse.json(ebook);
+  } catch (e) {
+    return NextResponse.json({ error: "Error updating ebook" }, { status: 500 });
+  }
+}

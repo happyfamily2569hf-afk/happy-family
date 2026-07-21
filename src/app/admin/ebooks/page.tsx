@@ -13,6 +13,14 @@ export default function AdminEbooksPage() {
   const [isUploading, setIsUploading] = useState(false);
   const router = useRouter();
 
+  // Edit states
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editCanvaUrl, setEditCanvaUrl] = useState("");
+  const [editCoverFile, setEditCoverFile] = useState<File | null>(null);
+  const [isEditUploading, setIsEditUploading] = useState(false);
+
   useEffect(() => {
     fetchEbooks();
   }, []);
@@ -58,6 +66,39 @@ export default function AdminEbooksPage() {
     setIsUploading(false);
   };
 
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingId) return;
+    setIsEditUploading(true);
+
+    let coverUrl = undefined;
+    if (editCoverFile) {
+      const uploadedUrl = await uploadFile(editCoverFile);
+      if (uploadedUrl) coverUrl = uploadedUrl;
+    }
+
+    const res = await fetch("/api/admin/ebooks", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        id: editingId, 
+        title: editTitle, 
+        description: editDescription,
+        fileUrl: editCanvaUrl,
+        coverUrl
+      })
+    });
+
+    if (res.ok) {
+      setEditingId(null);
+      fetchEbooks();
+      router.refresh();
+    } else {
+      alert("เกิดข้อผิดพลาดในการอัปเดต E-Book");
+    }
+    setIsEditUploading(false);
+  };
+
   const handleDelete = async (id: string) => {
     if (confirm("คุณต้องการลบ E-Book นี้ใช่หรือไม่?")) {
       const res = await fetch(`/api/admin/ebooks?id=${id}`, { method: "DELETE" });
@@ -66,6 +107,14 @@ export default function AdminEbooksPage() {
         router.refresh();
       }
     }
+  };
+
+  const startEdit = (ebook: any) => {
+    setEditingId(ebook.id);
+    setEditTitle(ebook.title);
+    setEditDescription(ebook.description);
+    setEditCanvaUrl(ebook.fileUrl);
+    setEditCoverFile(null);
   };
 
   return (
@@ -123,6 +172,63 @@ export default function AdminEbooksPage() {
         </form>
       </div>
 
+      {editingId && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
+          background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+        }}>
+          <div className="card-medee" style={{ padding: '2rem', width: '90%', maxWidth: '500px' }}>
+            <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', fontWeight: 600 }}>แก้ไข E-Book</h2>
+            <form onSubmit={handleEditSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <input 
+                type="text" 
+                placeholder="ชื่อหนังสือ" 
+                className="input-medee" 
+                value={editTitle} 
+                onChange={(e) => setEditTitle(e.target.value)} 
+                required 
+              />
+              <textarea 
+                placeholder="คำอธิบาย" 
+                className="input-medee" 
+                rows={3} 
+                value={editDescription} 
+                onChange={(e) => setEditDescription(e.target.value)} 
+                required 
+              />
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.9rem', color: 'var(--text-light)' }}>เปลี่ยนรูปหน้าปก (เลือกเฉพาะเมื่อต้องการเปลี่ยน)</label>
+                <input 
+                  type="file" 
+                  accept="image/*"
+                  className="input-medee" 
+                  onChange={(e) => setEditCoverFile(e.target.files?.[0] || null)} 
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.9rem', color: 'var(--text-light)' }}>ลิงก์ E-Book</label>
+                <input 
+                  type="text" 
+                  className="input-medee" 
+                  value={editCanvaUrl}
+                  onChange={(e) => setEditCanvaUrl(e.target.value)} 
+                  required 
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                <button type="submit" className="btn-primary" disabled={isEditUploading}>
+                  {isEditUploading ? 'กำลังบันทึก...' : 'บันทึกการแก้ไข'}
+                </button>
+                <button type="button" className="btn-outline" onClick={() => setEditingId(null)} disabled={isEditUploading}>ยกเลิก</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <div className="card-medee" style={{ padding: '2rem' }}>
         <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', fontWeight: 600 }}>รายการ E-Book ทั้งหมด</h2>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -145,9 +251,12 @@ export default function AdminEbooksPage() {
                 </td>
                 <td style={{ padding: '1rem' }}>{ebook.title}</td>
                 <td style={{ padding: '1rem' }}>
-                  <button onClick={() => handleDelete(ebook.id)} className="btn-outline" style={{ color: '#ef4444', borderColor: '#ef4444' }}>
-                    ลบ
-                  </button>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button onClick={() => startEdit(ebook)} className="btn-primary" style={{ padding: '0.25rem 0.75rem', fontSize: '0.9rem' }}>แก้ไข</button>
+                    <button onClick={() => handleDelete(ebook.id)} className="btn-outline" style={{ padding: '0.25rem 0.75rem', fontSize: '0.9rem', color: '#ef4444', borderColor: '#ef4444' }}>
+                      ลบ
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
