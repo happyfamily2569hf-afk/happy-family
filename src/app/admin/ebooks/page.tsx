@@ -128,6 +128,7 @@ export default function AdminEbooksPage() {
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ background: '#f1f5f9', textAlign: 'left' }}>
+              <th style={{ padding: '1rem', width: '80px' }}>รูปปก</th>
               <th style={{ padding: '1rem' }}>ชื่อหนังสือ</th>
               <th style={{ padding: '1rem' }}>จัดการ</th>
             </tr>
@@ -135,6 +136,13 @@ export default function AdminEbooksPage() {
           <tbody>
             {ebooks.map(ebook => (
               <tr key={ebook.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                <td style={{ padding: '1rem' }}>
+                  {ebook.coverUrl ? (
+                    <img src={ebook.coverUrl} alt="cover" style={{ width: '50px', height: '70px', objectFit: 'cover', borderRadius: '4px' }} />
+                  ) : (
+                    <div style={{ width: '50px', height: '70px', background: '#e2e8f0', borderRadius: '4px' }} />
+                  )}
+                </td>
                 <td style={{ padding: '1rem' }}>{ebook.title}</td>
                 <td style={{ padding: '1rem' }}>
                   <button onClick={() => handleDelete(ebook.id)} className="btn-outline" style={{ color: '#ef4444', borderColor: '#ef4444' }}>
@@ -145,7 +153,7 @@ export default function AdminEbooksPage() {
             ))}
             {ebooks.length === 0 && (
               <tr>
-                <td colSpan={2} style={{ padding: '1rem', textAlign: 'center', color: '#64748b' }}>ยังไม่มีข้อมูล</td>
+                <td colSpan={3} style={{ padding: '1rem', textAlign: 'center', color: '#64748b' }}>ยังไม่มีข้อมูล</td>
               </tr>
             )}
           </tbody>
